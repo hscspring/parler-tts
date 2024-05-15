@@ -2618,6 +2618,7 @@ class ParlerTTSForConditionalGeneration(PreTrainedModel):
                 streamer=streamer,
                 **model_kwargs,
             )
+            print(f"outputs: {outputs.shape}")
 
         else:
             raise ValueError(
@@ -2656,6 +2657,7 @@ class ParlerTTSForConditionalGeneration(PreTrainedModel):
             or generation_config.pad_token_id in output_ids
             or generation_config.eos_token_id in output_ids
         )
+        print(f"decode_sequentially: {decode_sequentially}")
         if not decode_sequentially:
             output_values = self.audio_encoder.decode(
                 output_ids,
@@ -2669,6 +2671,7 @@ class ParlerTTSForConditionalGeneration(PreTrainedModel):
                 if sample_mask.sum() > 0:
                     sample = sample[:, :, sample_mask]
                     sample = self.audio_encoder.decode(sample[None, ...], [audio_scales[sample_id]]).audio_values
+                    print(f"sample: {sample.shape}")
                     output_values.append(sample.transpose(0, 2))
                 else:
                     output_values.append(torch.zeros((1, 1, 1)).to(self.device))
